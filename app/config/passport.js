@@ -1,7 +1,7 @@
 'use strict';
 
 var GitHubStrategy = require('passport-github').Strategy;
-var User = require('../models/users');
+var User = require('../models/user');
 var configAuth = require('./auth');
 
 module.exports = function (passport) {
@@ -26,7 +26,6 @@ module.exports = function (passport) {
 				if (err) {
 					return done(err);
 				}
-
 				if (user) {
 					return done(null, user);
 				} else {
@@ -35,7 +34,7 @@ module.exports = function (passport) {
 					newUser.github.id = profile.id;
 					newUser.github.username = profile.username;
 					newUser.github.displayName = profile.displayName;
-					newUser.github.publicRepos = profile._json.public_repos;
+          newUser.github.publicRepos = profile._json.public_repos;
 					newUser.nbrClicks.clicks = 0;
 
 					newUser.save(function (err) {

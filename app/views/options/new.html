@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+    <title>New Option Form</title>
+    <link href="/public/css/main.css" rel="stylesheet" type="text/css">
+  </head>
+
+  <body>
+    <div class="container"> 
+      <div class="login">
+        <form action="/api/:user_id/polls" method="post">
+            <label for="poll_name">Poll name: </label>
+            <input id="poll_name" type="text" name="name_field" value="Default name for poll.">
+            <input type="submit" value="OK">
+        </form>
+      </div>
+    </div>
+  </body>
+
+</html>

@@ -1,34 +1,40 @@
 {
-  "name": "clementinejs-fcc",
-  "version": "1.0.1",
-  "description": "The elegant and lightweight boilerplate for full stack JavaScript.",
+  "name": "voting-app",
+  "version": "1.0.0",
+  "description": "[![Join the chat at https://gitter.im/johnstonbl01/clementinejs](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/johnstonbl01/clementinejs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)",
   "main": "server.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "dotenv": "^1.2.0",
+    "express": "^4.15.3",
+    "express-session": "^1.15.3",
+    "mongoose": "^4.10.4",
+    "passport": "^0.3.2",
+    "passport-github": "^1.1.0",
+    "pug": "^2.0.0-rc.2",
+    "pug-bootstrap": "0.0.15"
+  },
+  "devDependencies": {
+    "mocha": "^3.4.2",
+    "chai": "^4.0.1",
+    "chai-http": "^3.0.0",
+    "passport-stub": "^1.1.1"
+  },
+  "scripts": {
+    "test": "mocha",
+    "start": "node server.js"
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/johnstonbl01/clementinejs-fcc"
+    "url": "git+https://github.com/SCA2/voting-app.git"
   },
-  "homepage": "http://www.clementinejs.com/",
-  "bugs": "https://github.com/johnstonbl01/clementinejs-fcc/issues",
-  "keywords": [
-    "MongoDB",
-    "Mongoose",
-    "full stack",
-    "Express",
-    "Node",
-    "javascript",
-    "boilerplate"
-  ],
-  "scripts": {
-  "start": "node server.js"
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SCA2/voting-app/issues"
   },
-  "author": "Blake Johnston",
-  "license": "MIT",
-  "dependencies": {
-    "dotenv": "^1.2.0",
-    "express": "^4.12.4",
-    "express-session": "^1.11.3",
-    "mongoose": "^4.1.0",
-    "passport": "^0.3.0",
-    "passport-github": "^1.0.0"
-  }
+  "homepage": "https://github.com/SCA2/voting-app#readme"
 }

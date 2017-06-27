@@ -15,6 +15,9 @@ nav.navbar.navbar-default.container
           if isLoggedIn
             a(href='/api/' + user_id + '/polls/new') New Poll
       ul.nav.navbar-nav.navbar-right
+        li.link(style="margin-top: 7px")
+          p.navbar-btn
+            a.btn.twitter-share-button(href="https://twitter.com/share" data-show-count="false") Tweet
         li
           if isLoggedIn
             a(href="/profile") Profile
@@ -23,3 +26,4 @@ nav.navbar.navbar-default.container
             a(href="/logout") Logout
           else
             a(href="/auth/github") Login with GitHub
+script(async src="//platform.twitter.com/widgets.js" charset="utf-8")

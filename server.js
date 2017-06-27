@@ -1,6 +1,8 @@
 'use strict';
 
 var express = require('express');
+var app = express();
+
 var path = require('path');
 var routes = require('./app/routes/index.js');
 var mongoose = require('mongoose');
@@ -9,7 +11,6 @@ var session = require('express-session');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 
-var app = express();
 require('dotenv').load();
 require('./app/config/passport')(passport);
 

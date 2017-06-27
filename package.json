@@ -6,6 +6,10 @@
   "directories": {
     "test": "test"
   },
+  "engines": {
+    "npm": "2.14.4",
+    "node": "4.1.2"
+  },
   "dependencies": {
     "body-parser": "^1.17.2",
     "dotenv": "^1.2.0",

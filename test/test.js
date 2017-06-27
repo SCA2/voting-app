@@ -4,6 +4,7 @@ process.env.NODE_ENV = 'test';
 
 const mongoose = require("mongoose");
 const User = require('../app/models/user');
+const Poll = require('../app/models/poll');
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
@@ -15,9 +16,9 @@ const expect = chai.expect;
 chai.use(chaiHttp);
 passportStub.install(server);
 
-describe('User', () => {
+describe('Poll', () => {
 
-  var user;
+  var user, poll_1, poll_2;
 
   beforeEach(() => {
 
@@ -28,17 +29,29 @@ describe('User', () => {
         username: 'username',
         publicRepos: 10
       },
-      polls: {
-        'poll 1': { 'Clinton':  100,  'Trump':    101 },
-        'poll 2': { 'Batman':   2,    'Superman': 3   }
-      }
+      polls: []
     });
 
-    user.save();
+    poll_1 = new Poll({
+      poll: { 'President':    { 'Clinton':  100,  'Trump':    101 }},
+      _author: user.github.id
+    });
+
+    poll_2 = new Poll({
+      poll: { 'Superheroes':  { 'Batman':   2,    'Superman': 3   }},
+      _author: null
+    });
+
+    poll_1.save(err => { if(err) console.log(err) });
+    poll_2.save(err => { if(err) console.log(err) });
+    user.polls.push(poll_1._id);
+    user.save(err => { if(err) console.log(err) });
   });
 
   afterEach(() => {
     user.remove();
+    poll_1.remove();
+    poll_2.remove();
     passportStub.logout();
   });
 
@@ -66,10 +79,20 @@ describe('User', () => {
     });
   });
 
-  describe('/api/:id/polls', () => {
-    it('redirects to /login if user not logged in', (done) => {
+  describe('/api/polls', () => {
+    it('GETs all of the polls', (done) => {
       chai.request(server)
-      .get('/api/' + user.github.id + '/polls')
+      .get('/api/polls')
+      .end((err, res) => {
+        expect(res.text).to.include('President');
+        expect(res.text).to.include('Superheroes');
+        done();
+      });
+    });
+
+    it('redirects on POST if not logged in', (done) => {
+      chai.request(server)
+      .post('/api/polls')
       .redirects(0)
       .end((err, res) => {
         expect(res).to.redirect;
@@ -78,22 +101,23 @@ describe('User', () => {
       });
     });
 
-    it('GETs all of the users polls', (done) => {
+    it('POSTs a new poll', (done) => {
       passportStub.login(user);
       chai.request(server)
-      .get('/api/' + user.github.id + '/polls')
+      .post('/api/polls')
+      .send({poll_name: 'Ice Cream', option_1: 'Chocolate', option_2: 'Vanilla'})
       .end((err, res) => {
-        expect(res.text).to.include('poll 1');
-        expect(res.text).to.include('poll 2');
+        expect(res).to.have.status(200);
+        expect(res.text).to.include('Ice Cream');
         done();
       });
     });
   });
 
-  describe('/api/:id/polls/new', () => {
+  describe('/api/polls/new', () => {
     it('redirects to /login if user not logged in', (done) => {
       chai.request(server)
-      .get('/api/' + user.github.id + '/polls/new')
+      .get('/api/polls/new')
       .redirects(0)
       .end((err, res) => {
         expect(res).to.redirect;
@@ -105,30 +129,30 @@ describe('User', () => {
     it('GETs new poll form', (done) => {
       passportStub.login(user);
       chai.request(server)
-      .get('/api/' + user.github.id + '/polls/new')
+      .get('/api/polls/new')
       .end((err, res) => {
         expect(res.text).to.include('New Poll');
         done();
       })
     });
+  });
 
-    it('POSTs a new poll', (done) => {
+  describe('/api/polls/:id', () => {
+    it('GETs :poll_id', (done) => {
       passportStub.login(user);
       chai.request(server)
-      .post('/api/' + user.github.id + '/polls/new')
-      .send({poll_name: 'Ice Cream', option_1: 'Chocolate', option_2: 'Vanilla'})
+      .get('/api/polls/' + poll_1._id)
       .end((err, res) => {
-        expect(res).to.have.status(200);
-        expect(res.text).to.include('Ice Cream');
+        expect(res.text).to.include('President');
+        expect(res.text).to.include('Clinton');
+        expect(res.text).to.include('Trump');
         done();
       });
     });
-  });
 
-  describe('/api/:user_id/polls/:id', () => {
-    it('redirects to /login if user not logged in', (done) => {
+    it('redirects on PUT if user not logged in', (done) => {
       chai.request(server)
-      .get('/api/' + user.github.id + '/polls/' + 'poll 1')
+      .put('/api/polls/' + 'President')
       .redirects(0)
       .end((err, res) => {
         expect(res).to.redirect;
@@ -137,26 +161,26 @@ describe('User', () => {
       });
     });
 
-    it('GETs :poll_id', (done) => {
+    it('PUTs update to :poll_id', (done) => {
       passportStub.login(user);
       chai.request(server)
-      .get('/api/' + user.github.id + '/polls/' + 'poll 1')
+      .put('/api/polls/' + poll_1._id)
+      .send({poll: {'President': {'Sanders':0, 'Trump':0}}})
       .end((err, res) => {
-        expect(res.text).to.include('poll 1');
-        expect(res.text).to.include('Clinton');
+        expect(res.text).to.include('President');
+        expect(res.text).to.include('Sanders');
         expect(res.text).to.include('Trump');
         done();
       });
     });
 
-    it('PUTs new option in :poll_id', (done) => {
-      var option = { 'Wonder Woman': 0 };
-      passportStub.login(user);
+    it('redirects on DELETE if user not logged in', (done) => {
       chai.request(server)
-      .put('/api/' + user.github.id + '/polls/' + 'poll 2')
-      .send(option)
+      .delete('/api/polls/' + 'President')
+      .redirects(0)
       .end((err, res) => {
-        expect(Object.keys(res.body['poll 2'])).to.include('Wonder Woman');
+        expect(res).to.redirect;
+        expect(res.header.location).to.eql('/login');
         done();
       });
     });
@@ -164,19 +188,19 @@ describe('User', () => {
     it('DELETEs :poll_id', (done) => {
       passportStub.login(user);
       chai.request(server)
-      .delete('/api/' + user.github.id + '/polls/' + 'poll 1')
+      .delete('/api/polls/' + poll_1._id)
       .end((err, res) => {
-        expect(res).to.have.status(200);
-        expect(res.body).to.eql({});
+        expect(res.text).not.to.include('President');
+        expect(res.text).to.include('Superheroes');
         done();
       });
     });
   });
 
-  describe('/api/:user_id/polls/:poll_id/options/:option_id', () => {
-    it('redirects to /login if user not logged in', (done) => {
+  describe('/api/polls/:poll_id/options', () => {
+    it('redirects on POST if user not logged in', (done) => {
       chai.request(server)
-      .get('/api/' + user.github.id + '/polls/' + 'poll 2' + '/options/' + 'Batman')
+      .post('/api/polls/' + poll_2.id + '/options')
       .redirects(0)
       .end((err, res) => {
         expect(res).to.redirect;
@@ -185,10 +209,26 @@ describe('User', () => {
       });
     });
 
+    it('POSTs new option to :poll_id', (done) => {
+      var option = { new_option: 'Wonder Woman' };
+      passportStub.login(user);
+      chai.request(server)
+      .post('/api/polls/' + poll_2._id + '/options')
+      .send(option)
+      .end((err, res) => {
+        // console.log(res.text)
+        expect(res.text).to.include('Wonder Woman');
+        // expect(res.text).to.include('Batman');
+        done();
+      });
+    });
+  });
+
+  describe('/api/:user_id/polls/:poll_id/options/:option_id', () => {
     it('gets votes for :option_id in :poll_id', (done) => {
       passportStub.login(user);
       chai.request(server)
-      .get('/api/' + user.github.id + '/polls/' + 'poll 2' + '/options/' + 'Batman')
+      .get('/api/polls/' + poll_2._id + '/options/' + 'Batman')
       .end((err, res) => {
         expect(res.body).to.equal(2);
         done();
@@ -198,11 +238,34 @@ describe('User', () => {
     it('increments votes for :option_id in :poll_id', (done) => {
       passportStub.login(user);
       chai.request(server)
-      .put('/api/' + user.github.id + '/polls/' + 'poll 2' + '/options/' + 'Batman')
+      .put('/api/polls/' + poll_2._id + '/options/' + 'Batman')
       .end((err, res) => {
         expect(res.body).to.equal(3);
         done();
       });
     });
-  })
+
+    it('redirects on DELETE if user not logged in', (done) => {
+      chai.request(server)
+      .delete('/api/polls/' + poll_2._id + '/options/' + 'Batman')
+      .redirects(0)
+      .end((err, res) => {
+        expect(res).to.redirect;
+        expect(res.header.location).to.eql('/login');
+        done();
+      });
+    });
+
+    it('DELETEs :option_id from :poll_id', (done) => {
+      passportStub.login(user);
+      chai.request(server)
+      .delete('/api/polls/' + poll_2._id + '/options/' + 'Batman')
+      .end((err, res) => {
+        expect(res.text).to.include('Superheroes');
+        expect(res.text).to.not.include('Batman');
+        expect(res.text).to.include('Superman');
+        done();
+      });
+    });
+  });
 });

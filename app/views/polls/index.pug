@@ -1,18 +1,24 @@
-doctype 5
-html
-  head
-    title Poll Index
-    link(href="/public/css/main.css" rel="stylesheet" type="text/css")
-    link(href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css", rel="stylesheet", integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u", crossorigin="anonymous")      
-  body
-    .main.container
-      .row
-        .col-md-6.col-md-offset-3
-          h1.display-4.m-b-2 Polls
-          - if(polls)
-            each name in Object.keys(polls)
-              p
-                a(href='/api/' + user_id + '/polls/' + name)=name
-          - else
-            p No polls yet!
-    script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js", integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa", crossorigin="anonymous")
+extends ../layout/layout.pug
+
+block content
+  .main.container
+    .row
+      .col-md-8.col-md-offset-2
+        .panel.panel-default
+          .panel-heading
+            h2.text-center Polls!
+            h4 Select a poll to see the results and vote, or sign-in to make a new poll.
+          if polls
+            ul.list-group
+              each poll in polls
+                -name = Object.keys(poll.poll);
+                -poll_id = poll._id
+                li.list-group-item
+                  a(href='/api/polls/' + poll_id)=name
+                  if isLoggedIn
+                    form(action=href='/api/polls/' + poll_id + '?_method=DELETE' method='post')
+                      button(type="submit") Delete
+          if isLoggedIn
+            .panel-footer
+              h4.text-center Make a&nbsp;
+                a(href='/api/polls/new') new poll.

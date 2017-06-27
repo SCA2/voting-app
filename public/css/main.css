@@ -202,3 +202,11 @@ span {
 	display: inline;
 	margin: 0;
 }
+
+/* Single Poll Styling */
+
+.poll-container {
+  display: flex;
+  justify-content: flex-center;
+  align-items: center;
+}

@@ -1,0 +1,25 @@
+nav.navbar.navbar-default.container
+  .container-fluid
+    .navbar-header
+      button(type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false")
+        span.sr-only Toggle navigation
+        span.icon-bar 
+        span.icon-bar 
+        span.icon-bar 
+      a.navbar-brand(href="/") FCC Voting App
+    .collapse.navbar-collapse#bs-example-navbar-collapse-1
+      ul.nav.navbar-nav
+        li.link
+          a(href='/api/polls') Polls
+        li.link
+          if isLoggedIn
+            a(href='/api/' + user_id + '/polls/new') New Poll
+      ul.nav.navbar-nav.navbar-right
+        li
+          if isLoggedIn
+            a(href="/profile") Profile
+        li
+          if isLoggedIn
+            a(href="/logout") Logout
+          else
+            a(href="/auth/github") Login with GitHub

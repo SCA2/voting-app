@@ -1,0 +1,23 @@
+extends ../layout/layout.pug
+
+block content
+  .main.container
+    .row
+      .poll-container
+        .col-md-5.col-md-offset-1
+          - name = Object.keys(poll)[0]
+          - options = poll[name]
+          - candidates = Object.keys(options).sort()
+          h2.display-4.m-b-2=name
+          ul.list-group(id=name)
+            each candidate in candidates
+              li(id=candidate).list-group-item.option
+                =candidate
+                span.badge=options[candidate]
+          if isLoggedIn
+            form(action="/api/:user_id/polls/new" method="post")
+              div.form-group
+                label(for="option_1") Option 1
+                input#option_1.form-control(type="text" name="option_1" value=option_1)
+        .col-md-5
+          #donut(data-poll=poll)

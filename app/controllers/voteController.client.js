@@ -26,20 +26,22 @@
     html += `<svg width="100%" height="100%" viewBox="0 0 42 42" class="donut">`;
     html += `<circle class="donut-hole" cx="21" cy="21" r="15.92" fill="#fff" />`;
     html += `<circle class="donut-ring" cx="21" cy="21" r="15.92" fill="transparent" stroke="#d2d3d4" stroke-width="5" />`;
-    candidates.forEach(candidate => {
-      on = Math.round(options[candidate].votes / voteTotal * 100);
-      segment = `${on},${100 - on}`;
-      html += `<circle
-        class="donut-segment"
-        cx="21" cy="21" r="15.92"
-        fill="transparent"
-        stroke=${options[candidate].color}
-        stroke-width="5"
-        stroke-dasharray=${segment}
-        stroke-dashoffset=${offset}
-      />`;
-      offset -= on;
-    });
+    if(voteTotal > 0) {
+      candidates.forEach(candidate => {
+        on = Math.round(options[candidate].votes / voteTotal * 100);
+        segment = `${on},${100 - on}`;
+        html += `<circle
+          class="donut-segment"
+          cx="21" cy="21" r="15.92"
+          fill="transparent"
+          stroke=${options[candidate].color}
+          stroke-width="5"
+          stroke-dasharray=${segment}
+          stroke-dashoffset=${offset}
+        />`;
+        offset -= on;
+      });
+    }
     html += `</svg>`;
     return html;
   };

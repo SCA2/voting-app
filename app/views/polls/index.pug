@@ -15,7 +15,7 @@ block content
                 -poll_id = poll._id
                 li.list-group-item
                   a(href='/api/polls/' + poll_id)=name
-                  if isLoggedIn
+                  if isLoggedIn && (user_id == poll.author)
                     form(action=href='/api/polls/' + poll_id + '?_method=DELETE' method='post')
                       button(type="submit") Delete
           if isLoggedIn
